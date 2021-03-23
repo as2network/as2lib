@@ -1,9 +1,6 @@
-# `Solidity Truffle Boilerplate`
+# `as2lib-solidity`
 
-  </p>
-</p>
-<br />
-<br />
+> AS2Lib Solidity + AS2 API
 
 ## Developer Tools 🛠️
 
@@ -48,5 +45,3 @@ $ NETWORK=kovan yarn run verify YourContractName
 ## License
 
 SPDX-License-Identifier: MIT/ISC
-
-
