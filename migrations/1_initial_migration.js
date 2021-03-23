@@ -1,7 +1,7 @@
 const Migrations = artifacts.require('./Migrations.sol');
-const Soliditemp = artifacts.require('./Soliditemp.sol');
+const Soliditemp = artifacts.require('./AS2.sol');
 
 module.exports = function (deployer) {
     deployer.deploy(Migrations);
-    deployer.deploy(Soliditemp);
+    deployer.deploy(AS2);
 };
