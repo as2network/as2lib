@@ -1,0 +1,50 @@
+{
+    "name": "as2network-lib",
+    "version": "0.0.1",
+    "description": "libsolidity",
+    "license": "SEE LICENSE IN LICENSE",
+    "dependencies": {
+        "@openzeppelin/contracts": "^2.5.1"
+    },
+    "devDependencies": {
+        "@chainsafe/truffle-plugin-abigen": "^0.0.2",
+        "@openzeppelin/test-helpers": "^0.5.5",
+        "@types/chai": "^4.2.15",
+        "@types/mocha": "^8.2.2",
+        "@types/node": "^14.14.35",
+        "chai": "^4.2.0",
+        "coveralls": "^3.1.0",
+        "eslint": "^6.8.0",
+        "eslint-config-standard": "^14.1.1",
+        "eslint-plugin-import": "^2.20.2",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-promise": "^4.0.1",
+        "eslint-plugin-standard": "^4.0.0",
+        "eth-gas-reporter": "^0.2.17",
+        "ethlint": "^1.2.5",
+        "prettier": "^2.2.1",
+        "prettier-plugin-solidity": "^1.0.0-beta.6",
+        "solc": "^0.4.26",
+        "solhint-plugin-prettier": "^0.0.5",
+        "solidity-coverage": "^0.7.16",
+        "solium": "^1.2.5",
+        "solpp": "^0.11.3",
+        "truffle": "^5.2.5",
+        "truffle-typings": "^1.0.8",
+        "ts-generator": "^0.1.1",
+        "ts-node": "^9.1.1",
+        "typechain": "^1.0.5",
+        "typechain-target-truffle": "^1.0.2"
+    },
+    "scripts": {
+       "compile": "npx truffle compile",
+        "test": "scripts/test.sh",
+        "coverage": "scripts/coverage.sh && cat coverage/lcov.info | coveralls",
+        "lint:js": "eslint .",
+        "lint:js:fix": "eslint . --fix",
+        "lint:sol": "solium -d .",
+        "lint:sol:fix": "solium -d . --fix",
+        "lint": "yarn run lint:js && yarn run lint:sol",
+        "lint:fix": "yarn run lint:js:fix && yarn run lint:sol:fix"
+    }
+}
