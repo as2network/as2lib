@@ -2,13 +2,12 @@
 pragma solidity 0.4.26;
 pragma experimental ABIEncoderV2;
 
-
 /**
- * @title AS2 Library 
+ * @title AS2 Library
  * @author as2.network
  */
- 
- /// @dev Math operations with safety checks that throw on error 
+
+/// @dev Math operations with safety checks that throw on error
 library SafeMath {
     /**
      * @dev Multiplies two numbers, throws on overflow.
@@ -51,21 +50,9 @@ library SafeMath {
 }
 
 interface ERC721 {
-    event Transfer(
-        address indexed _from,
-        address indexed _to,
-        uint256 _tokenId
-    );
-    event Approval(
-        address indexed _owner,
-        address indexed _approved,
-        uint256 _tokenId
-    );
-    event ApprovalForAll(
-        address indexed _owner,
-        address indexed _operator,
-        bool _approved
-    );
+    event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
+    event Approval(address indexed _owner, address indexed _approved, uint256 _tokenId);
+    event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
     function name() external view returns (string _name);
 
@@ -89,24 +76,15 @@ interface ERC721 {
 
     function setApprovalForAll(address _to, bool _approved) external;
 
-    function getApprovedAddress(uint256 _tokenId)
-        external
-        view
-        returns (address);
+    function getApprovedAddress(uint256 _tokenId) external view returns (address);
 
-    function isApprovedForAll(address _owner, address _operator)
-        external
-        view
-        returns (bool);
+    function isApprovedForAll(address _owner, address _operator) external view returns (bool);
 
     function totalSupply() external view returns (uint256);
 
     function tokenByIndex(uint256 _index) external view returns (uint256);
 
-    function tokenOfOwnerByIndex(address _owner, uint256 _index)
-        external
-        view
-        returns (uint256);
+    function tokenOfOwnerByIndex(address _owner, uint256 _index) external view returns (uint256);
 }
 
 contract AllowanceAndOwnershipContract is ERC721 {
@@ -127,45 +105,26 @@ contract AllowanceAndOwnershipContract is ERC721 {
         _;
     }
 
-    function getApprovedAddress(uint256 _tokenId)
-        public
-        view
-        returns (address)
-    {
+    function getApprovedAddress(uint256 _tokenId) public view returns (address) {
         return tokenApprovals[_tokenId];
     }
 
-    function isSpecificallyApprovedFor(address _asker, uint256 _tokenId)
-        internal
-        view
-        returns (bool)
-    {
+    function isSpecificallyApprovedFor(address _asker, uint256 _tokenId) internal view returns (bool) {
         return getApprovedAddress(_tokenId) == _asker;
     }
 
-    function isApprovedForAll(address _owner, address _operator)
-        public
-        view
-        returns (bool)
-    {
+    function isApprovedForAll(address _owner, address _operator) public view returns (bool) {
         return operatorApprovals[_owner][_operator];
     }
 
-    function isSenderApprovedFor(uint256 _tokenId)
-        internal
-        view
-        returns (bool)
-    {
+    function isSenderApprovedFor(uint256 _tokenId) internal view returns (bool) {
         return
             ownerOf(_tokenId) == msg.sender ||
             isSpecificallyApprovedFor(msg.sender, _tokenId) ||
             isApprovedForAll(ownerOf(_tokenId), msg.sender);
     }
 
-    function approve(address _to, uint256 _tokenId)
-        external
-        onlyOwnerOf(_tokenId)
-    {
+    function approve(address _to, uint256 _tokenId) external onlyOwnerOf(_tokenId) {
         address owner = ownerOf(_tokenId);
         require(_to != owner);
         if (getApprovedAddress(_tokenId) != 0 || _to != 0) {
@@ -239,19 +198,12 @@ contract ERC721BasicTokenContract is AllowanceAndOwnershipContract {
         return ownedTokens[_owner];
     }
 
-    function tokenOfOwnerByIndex(address _owner, uint256 _index)
-        external
-        view
-        returns (uint256)
-    {
+    function tokenOfOwnerByIndex(address _owner, uint256 _index) external view returns (uint256) {
         require(_index < balanceOf(_owner));
         return ownedTokens[_owner][_index];
     }
 
-    function transfer(address _to, uint256 _tokenId)
-        external
-        onlyOwnerOf(_tokenId)
-    {
+    function transfer(address _to, uint256 _tokenId) external onlyOwnerOf(_tokenId) {
         _clearApprovalAndTransfer(msg.sender, _to, _tokenId);
     }
 
@@ -379,10 +331,7 @@ contract AnchoringContract is Ownable, ERC721BasicTokenContract {
         string hash
     );
 
-    constructor(string _name, string _symbol)
-        public
-        ERC721BasicTokenContract(_name, _symbol)
-    {}
+    constructor(string _name, string _symbol) public ERC721BasicTokenContract(_name, _symbol) {}
 
     /**
         EDI save in both create and update
@@ -403,11 +352,7 @@ contract AnchoringContract is Ownable, ERC721BasicTokenContract {
 
         //Convert hash of attestation into solidty-compatible bytes32 hash. This will be used as a transactionId (referenceId) for the attestation.
         bytes32 referenceId = keccak256(abi.encodePacked(hash));
-        AttestationReference memory reference = AttestationReference(
-            attestationId,
-            versionId,
-            now
-        );
+        AttestationReference memory reference = AttestationReference(attestationId, versionId, now);
         attestationReference[referenceId] = reference;
         emit AttestationSaved(referenceId, attestationId, versionId, hash);
 
@@ -420,8 +365,7 @@ contract AnchoringContract is Ownable, ERC721BasicTokenContract {
     function _hashExists(string hash) internal returns (bool) {
         bytes32 referenceId = keccak256(abi.encodePacked(hash));
 
-            AttestationReference storage targetAttestationReference
-         = attestationReference[referenceId];
+        AttestationReference storage targetAttestationReference = attestationReference[referenceId];
         return targetAttestationReference.createdAt != 0;
     }
 
@@ -430,9 +374,7 @@ contract AnchoringContract is Ownable, ERC721BasicTokenContract {
         Just to check attestation track exists or not.
     */
     function _isReferenceExists(bytes32 referenceId) internal returns (bool) {
-
-            AttestationReference storage targetAttestationReference
-         = attestationReference[referenceId];
+        AttestationReference storage targetAttestationReference = attestationReference[referenceId];
         return targetAttestationReference.createdAt != 0;
     }
 
@@ -444,20 +386,12 @@ contract AnchoringContract is Ownable, ERC721BasicTokenContract {
     /**
         Get version details(hash, description) by referenceId of that version.
     */
-    function _getByReferenceId(bytes32 referenceId)
-        internal
-        view
-        returns (Version)
-    {
+    function _getByReferenceId(bytes32 referenceId) internal view returns (Version) {
         require(_isReferenceExists(referenceId));
 
-
-            AttestationReference storage targetAttestationReference
-         = attestationReference[referenceId];
-        Version[] storage versions = versionOf[targetAttestationReference
-            .attestationId];
-        Version storage targetVersion = versions[targetAttestationReference
-            .versionId];
+        AttestationReference storage targetAttestationReference = attestationReference[referenceId];
+        Version[] storage versions = versionOf[targetAttestationReference.attestationId];
+        Version storage targetVersion = versions[targetAttestationReference.versionId];
 
         return targetVersion;
     }
@@ -465,11 +399,7 @@ contract AnchoringContract is Ownable, ERC721BasicTokenContract {
     /**
         Create a track of new attestation and return referenceId which can be used to check track of that attestation.
     */
-    function createAttestation(string hash, string description)
-        external
-        onlyOwner
-        returns (bytes32)
-    {
+    function createAttestation(string hash, string description) external onlyOwner returns (bytes32) {
         bytes32 referenceId = _save(ediRefCounter, hash, description);
         _mint(msg.sender, ediRefCounter);
         ediRefCounter = ediRefCounter + 1;
@@ -490,12 +420,12 @@ contract AnchoringContract is Ownable, ERC721BasicTokenContract {
     }
 
     /**
-    *     Accept a hash of any version of a attestation and return a list of hashes containing all versions hashes of that attestation.
-    */
+     *     Accept a hash of any version of a attestation and return a list of hashes containing all versions hashes of that attestation.
+     */
     function getAllByHash(string hash) external view returns (string[]) {
         require(_hashExists(hash));
 
-       /**  Convert hash of attestation into solidty-compatible bytes32 hash. This will be used as a transactionId (referenceId) for the attestation. */
+        /**  Convert hash of attestation into solidty-compatible bytes32 hash. This will be used as a transactionId (referenceId) for the attestation. */
         bytes32 referenceId = keccak256(abi.encodePacked(hash));
 
         return getAllByReferenceId(referenceId);
@@ -505,11 +435,7 @@ contract AnchoringContract is Ownable, ERC721BasicTokenContract {
      Accept a referenceId of any version of a attestation and return hash of that version.
        referenceId get in response of create/update attestation.
     */
-    function getHashByReferenceId(bytes32 referenceId)
-        external
-        view
-        returns (string)
-    {
+    function getHashByReferenceId(bytes32 referenceId) external view returns (string) {
         return _getByReferenceId(referenceId).hash;
     }
 
@@ -517,11 +443,7 @@ contract AnchoringContract is Ownable, ERC721BasicTokenContract {
         Accept a referenceId of any version of a attestation and return hash and description of that version.
         * referenceId get in response of create/update attestation.
     */
-    function getByReferenceId(bytes32 referenceId)
-        external
-        view
-        returns (string, string)
-    {
+    function getByReferenceId(bytes32 referenceId) external view returns (string, string) {
         require(_isReferenceExists(referenceId));
 
         Version memory targetVersion = _getByReferenceId(referenceId);
@@ -549,18 +471,11 @@ contract AnchoringContract is Ownable, ERC721BasicTokenContract {
         Accept a referenceId of any version of a attestation and return a list of hashes containing all versions hashes of that attestation.
         * referenceId get in response of create/update attestation.
     */
-    function getAllByReferenceId(bytes32 referenceId)
-        public
-        view
-        returns (string[])
-    {
+    function getAllByReferenceId(bytes32 referenceId) public view returns (string[]) {
         require(_isReferenceExists(referenceId));
 
-
-            AttestationReference storage targetAttestationReference
-         = attestationReference[referenceId];
-        Version[] storage versions = versionOf[targetAttestationReference
-            .attestationId];
+        AttestationReference storage targetAttestationReference = attestationReference[referenceId];
+        Version[] storage versions = versionOf[targetAttestationReference.attestationId];
         string[] memory hashList = new string[](versions.length);
         for (uint256 i = 0; i < versions.length; i++) {
             hashList[i] = versions[i].hash;
