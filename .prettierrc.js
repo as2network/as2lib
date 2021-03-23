@@ -1,4 +1,3 @@
-
 /**
  * @file Prettier configuration for Solidity
  * @version 1.0.8

@@ -5,23 +5,27 @@ import Document from '../providers/document';
 
 function save(req, res, next) {
   if (!req.body.hash || !req.body.description) {
-    return next(new Error('Document hash and description is required'))
+    return next(new Error('Document hash and description is required'));
   }
-  Document.isHashExists(req.body.hash).then(resp => {
-    if (resp) {
-      let err = new Error('Hash already exists.');
-      err.status = 400;
-      next(err);
-      return;
-    }
-    Document.createOrUpdate(null, req.body).then(resp => {
-        res.send(resp);
-      }, error => {
-        next(error);
-      })
-    }, error => {
-
-  });
+  Document.isHashExists(req.body.hash).then(
+    (resp) => {
+      if (resp) {
+        let err = new Error('Hash already exists.');
+        err.status = 400;
+        next(err);
+        return;
+      }
+      Document.createOrUpdate(null, req.body).then(
+        (resp) => {
+          res.send(resp);
+        },
+        (error) => {
+          next(error);
+        },
+      );
+    },
+    (error) => {},
+  );
 }
 
 function update(req, res, next) {
@@ -30,10 +34,10 @@ function update(req, res, next) {
   }
 
   if (!req.body.hash || !req.body.description) {
-    return next(new Error('Document hash and description is required'))
+    return next(new Error('Document hash and description is required'));
   }
 
-  Document.isHashExists(req.body.hash).then(resp => {
+  Document.isHashExists(req.body.hash).then((resp) => {
     if (resp) {
       let err = new Error('Hash already exists.');
       err.status = 400;
@@ -41,69 +45,84 @@ function update(req, res, next) {
       return;
     }
 
-    Document.createOrUpdate(req.params.referenceId, req.body).then(resp => {
-      res.send(resp);
-    }, error => {
-      next(error);
-    })
+    Document.createOrUpdate(req.params.referenceId, req.body).then(
+      (resp) => {
+        res.send(resp);
+      },
+      (error) => {
+        next(error);
+      },
+    );
   });
 }
 
 function getAllByReferenceId(req, res, next) {
   if (!req.params.referenceId) {
-    return next(new Error('Document reference id not found'))
+    return next(new Error('Document reference id not found'));
   }
 
-  Document.isReferenceExists(req.params.referenceId).then(resp => {
-    if (!resp) {
+  Document.isReferenceExists(req.params.referenceId).then(
+    (resp) => {
+      if (!resp) {
+        let err = new Error('No document found.');
+        err.status = 404;
+        next(err);
+        return;
+      }
+      Document.getAllByTransaction(req.params.referenceId).then(
+        (resp) => {
+          res.send(resp);
+        },
+        (error) => {
+          next(new Error('Something went wrong in fetching records'));
+        },
+      );
+    },
+    (error) => {
       let err = new Error('No document found.');
       err.status = 404;
       next(err);
       return;
-    }
-    Document.getAllByTransaction(req.params.referenceId).then(resp => {
-      res.send(resp);
-    }, error => {
-      next(new Error('Something went wrong in fetching records'))
-    })
-  }, error => {
-      let err = new Error('No document found.');
-      err.status = 404;
-      next(err);
-      return;
-  });
+    },
+  );
 }
 
 function getOneByReferenceId(req, res, next) {
   if (!req.params.referenceId) {
-    return next(new Error('Document reference id not found'))
+    return next(new Error('Document reference id not found'));
   }
-  Document.isReferenceExists(req.params.referenceId).then(resp => {
-    if (!resp) {
+  Document.isReferenceExists(req.params.referenceId).then(
+    (resp) => {
+      if (!resp) {
+        let err = new Error('No document found.');
+        err.status = 404;
+        next(err);
+        return;
+      }
+      Document.getByTransaction(req.params.referenceId).then(
+        (resp) => {
+          res.send(resp);
+        },
+        (error) => {
+          next(new Error('Something went wrong in fetching records'));
+        },
+      );
+    },
+    (error) => {
       let err = new Error('No document found.');
       err.status = 404;
       next(err);
       return;
-    }
-    Document.getByTransaction(req.params.referenceId).then(resp => {
-      res.send(resp);
-    }, error => {
-      next(new Error('Something went wrong in fetching records'))
-    })
-  }, error => {
-      let err = new Error('No document found.');
-      err.status = 404;
-      next(err);
-      return;
-  });
+    },
+  );
 }
 
 function getByHash(req, res, next) {
   if (!req.params.hash) {
-    return next(new Error('Hash not found'))
+    return next(new Error('Hash not found'));
   }
 
-  Document.isHashExists(req.params.hash).then(resp => {
+  Document.isHashExists(req.params.hash).then((resp) => {
     if (!resp) {
       let err = new Error('No document found.');
       err.status = 404;
@@ -111,11 +130,14 @@ function getByHash(req, res, next) {
       return;
     }
 
-    Document.getByHash(req.params.hash).then(resp => {
-      res.send(resp);
-    }, error => {
-      next(new Error('Something went wrong in fetching records'))
-    })
+    Document.getByHash(req.params.hash).then(
+      (resp) => {
+        res.send(resp);
+      },
+      (error) => {
+        next(new Error('Something went wrong in fetching records'));
+      },
+    );
   });
 }
 
@@ -124,5 +146,5 @@ export default {
   update,
   getByHash,
   getOneByReferenceId,
-  getAllByReferenceId
-}
+  getAllByReferenceId,
+};

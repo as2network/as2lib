@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import methodOverride from 'method-override';
-import cors from 'cors'
+import cors from 'cors';
 import path from 'path';
 import logger from 'morgan';
 import routes from '../routes/index.route';
@@ -25,14 +25,15 @@ app.use(cors());
 app.use('/', routes);
 
 app.use((req, res, next) => {
-    const err = new Error('API resource not found');
-    err.status = 404;
-    return next(err);
+  const err = new Error('API resource not found');
+  err.status = 404;
+  return next(err);
 });
 
-app.use((err, req, res, next) => {// eslint-disable-line no-unused-vars
+app.use((err, req, res, next) => {
+  // eslint-disable-line no-unused-vars
   let respMessage = {
-      message: err.message || err.toString()
+    message: err.message || err.toString(),
   };
 
   if (config.env === 'development') {

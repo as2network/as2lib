@@ -1,15 +1,13 @@
 import { Buffer } from 'buffer';
 import tx from 'ethereumjs-tx';
 import Web3 from 'web3';
-import config from '../config/config'
+import config from '../config/config';
 
 class Web3Provider {
   web3;
   initialized;
-  
-  constructor() {
-    
-  }
+
+  constructor() {}
 
   init() {
     return new Promise((resolve, reject) => {
@@ -29,57 +27,59 @@ class Web3Provider {
     return this.web3;
   }
 
-  signTransaction(rawTx){
+  signTransaction(rawTx) {
     return new Promise((resolve, reject) => {
       let privateKey = new Buffer(config.private_key.substr(2), 'hex');
       let transaction = new tx(rawTx);
       transaction.sign(privateKey);
       let serializedTx = transaction.serialize();
-      serializedTx = '0x' + serializedTx.toString('hex')
+      serializedTx = '0x' + serializedTx.toString('hex');
       resolve(serializedTx);
-    })
-  }
-
-  call (address, fn, args, resp) {
-    return new Promise((resolve, reject) => {
-      let txOptions = this.generateCall(address, fn, args, resp);
-      this.web3.eth.call(txOptions).then(data => {
-        console.log(data);
-        // data = this.decodeArrayOfStrings(data);
-        // data = this.web3.eth.abi.decodeParameters(resp, data);
-        // Decode data where you need it and how you need it
-        resolve(data);
-      })
-      .catch(error => {
-        reject(error);
-      })
     });
   }
 
-  getTransactionCount(address = ''){
+  call(address, fn, args, resp) {
+    return new Promise((resolve, reject) => {
+      let txOptions = this.generateCall(address, fn, args, resp);
+      this.web3.eth
+        .call(txOptions)
+        .then((data) => {
+          console.log(data);
+          // data = this.decodeArrayOfStrings(data);
+          // data = this.web3.eth.abi.decodeParameters(resp, data);
+          // Decode data where you need it and how you need it
+          resolve(data);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  }
+
+  getTransactionCount(address = '') {
     address = address || this.getDefaultAccount();
     return new Promise((resolve, reject) => {
-      this
-        .web3.eth.getTransactionCount(address)
+      this.web3.eth
+        .getTransactionCount(address)
         .then((count) => {
           resolve(count.toString());
         })
         .catch((err) => {
-          reject(err)
-        })
+          reject(err);
+        });
     });
   }
 
   toHex(number) {
-    return this.web3.utils.toHex(number)
+    return this.web3.utils.toHex(number);
   }
 
-  generateCall (address, contract, fn, args, resp) {
+  generateCall(address, contract, fn, args, resp) {
     let txOptions = {
-      to: address
+      to: address,
     };
 
-    txOptions.data = contract.methods[fn](args).encodeABI()
+    txOptions.data = contract.methods[fn](args).encodeABI();
     return txOptions;
   }
 
@@ -87,7 +87,7 @@ class Web3Provider {
     this.web3.eth.defaultAccount = address;
   }
 
-  getDefaultAccount () {
+  getDefaultAccount() {
     return this.web3.eth.defaultAccount;
   }
 
